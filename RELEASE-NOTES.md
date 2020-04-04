@@ -1,6 +1,22 @@
 # Release Notes
 All notable changes to this project will be documented in this file.
 
+## [OWF 8.0.0.1-RC1] - 2020-03-29
+
+Backend:
+* Add migration support for Oracle database
+* Add two new example widgets
+* Bump Django version number 
+* Bump Waitress Version number
+
+Frontend:
+* Bump node-sass version number
+
+General: 
+* Documentation improvements
+* Improve bundle creation script (build.sh)
+
+
 ## [OWF 8.0.0.0-GA] - 2020-01-13
 
 Backend:
