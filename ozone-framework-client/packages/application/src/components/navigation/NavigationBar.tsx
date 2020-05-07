@@ -1,6 +1,6 @@
 import styles from "./index.scss";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useBehavior } from "../../hooks";
 
 import { mainStore } from "../../stores/MainStore";
@@ -24,11 +24,32 @@ import {
     UserMenuButton,
     WidgetsButton
 } from "./internal";
+import { UserPreferenceAPI, userPreferenceApi } from '../../api/clients/PreferenceUserAPI';
+import { authStore } from '../../stores/AuthStore';
 
 const _NavigationBar: React.FC<PropsBase> = ({ className }) => {
     const isStoreOpen = useBehavior(mainStore.isStoreOpen);
     const dashboard = useBehavior(dashboardStore.currentDashboard);
     const { isLocked } = useBehavior(dashboard.state);
+    const currentUser = useBehavior(authStore.user);
+    const [isLockEnabled, setLockEnabled] = useState(false);
+    const dashboardLockPrefPath = "dashboard.lock";
+
+    useEffect(() => {
+        getDashboardLockPreference().then((response: boolean) => {
+            setLockEnabled(response);
+        });    
+    });
+
+    const getDashboardLockPreference = async () =>  {
+
+        if (!currentUser) return false;
+        else if (currentUser.isAdmin) return true;
+
+        const response = await userPreferenceApi.getPreference("dashboard", "dashboard.lockEnabled");
+        const lockEnabled = response.data.data;
+        return lockEnabled.length > 0 && lockEnabled[0].value === 'true';
+    };
 
     return (
         <Navbar className={classNames(styles.navbar, className)}>
@@ -45,7 +66,7 @@ const _NavigationBar: React.FC<PropsBase> = ({ className }) => {
             </NavbarGroup>
 
             <NavbarGroup className={styles.group} align={Alignment.RIGHT}>
-                <LockButton dashboard={dashboard} isLocked={isLocked} isStoreOpen={isStoreOpen} />
+                <LockButton dashboard={dashboard} isLocked={isLocked} isStoreOpen={isStoreOpen} isLockEnabled={isLockEnabled}  />
                 <SaveDashboardButton isStoreOpen={isStoreOpen} />
                 <AddLayoutButton isLocked={isLocked} isStoreOpen={isStoreOpen} />
                 <NavbarDivider />
